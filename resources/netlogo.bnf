@@ -1,0 +1,40 @@
+S = block+
+block = toline (line newline)+ endline
+<toline> = (to-report |to) whitespace identifier (whitespace inputs)? finish newline
+<endline> = end finish
+line = whitespace? (ifelse | ask | report | (identifier (whitespace arg)*)) finish
+<finish> = whitespace? comment?
+<newline> = <"\n">
+to = <"to">
+to-report = <"to-report">
+end = <"end">
+identifier = #'[a-zA-Z-]+'
+<comment> = <";"> <#'.*'>
+<whitespace> = <#'\s+'>
+arg = number
+<number> = #"\d+"
+report = <"report"> whitespace expression
+<expression> = number
+	| identifier
+	| (random whitespace number)
+	| (math whitespace inputs whitespace <"of"> whitespace thing)
+	| (identifier whitespace binary whitespace number)
+	| "(" whitespace? expression whitespace? ")"
+	| unary whitespace expression
+<unary> = minus
+<binary> = gte
+gte = <">=">
+minus = <"-">
+inputs = <"["> identifier <"]">
+<math> = mean
+mean = <"mean">
+<thing> = turtles
+turtles = <"turtles">
+ask = <"ask"> whitespace thing whitespace <"["> (whitespace | newline) (whitespace? move newline?)* (whitespace | newline) <"]">
+move = direction whitespace expression finish
+<direction> = forward | right
+forward = <"forward">
+right = <"right">
+random = <"random">
+ifblock = <"["> (whitespace | newline) line (newline line)* (whitespace | newline) <"]"> finish
+ifelse = <"ifelse"> whitespace expression finish newline whitespace? ifblock (whitespace | newline) ifblock

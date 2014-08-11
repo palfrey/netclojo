@@ -13,6 +13,14 @@
 
   :source-paths ["src"]
 
+  :profiles {:generator
+			 {
+			  :dependencies [[instaparse "1.3.3"]]
+			  :main "netclojo.generator"
+			 }
+			}
+  :aliases {"generator" ["with-profile" "+generator" "run"]}
+
   :cljsbuild {
     :builds [{:id "netclojo"
               :source-paths ["src"]
