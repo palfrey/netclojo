@@ -1,5 +1,7 @@
-S = block+
-block = toline (line newline)+ endline
+S = globals? block+
+globals = <"globals"> whitespace inputs finish newline
+own-thing = thing <"-own"> whitespace inputs finish newline
+block = (whitespace? newline) | own-thing | toline (line newline)+ endline
 <toline> = (to-report |to) whitespace identifier (whitespace inputs)? finish newline
 <endline> = end finish
 line = whitespace? (ifelse | ask | report | (identifier (whitespace arg)*)) finish
@@ -8,33 +10,31 @@ line = whitespace? (ifelse | ask | report | (identifier (whitespace arg)*)) fini
 to = <"to">
 to-report = <"to-report">
 end = <"end">
-identifier = #'[a-zA-Z-]+'
+identifier = #'[a-zA-Z][a-zA-Z-\d]*'
 <comment> = <";"> <#'.*'>
 <whitespace> = <#'\s+'>
-arg = number
+arg = number | identifier | expression
 <number> = #"\d+"
 report = <"report"> whitespace expression
 <expression> = number
 	| identifier
-	| (random whitespace number)
-	| (math whitespace inputs whitespace <"of"> whitespace thing)
+	| (math whitespace expression)
 	| (identifier whitespace binary whitespace number)
-	| "(" whitespace? expression whitespace? ")"
+	| brackets
 	| unary whitespace expression
+	| inputs whitespace <"of"> whitespace identifier
+brackets = <"("> whitespace? expression whitespace? <")">
 <unary> = minus
 <binary> = gte
 gte = <">=">
 minus = <"-">
-inputs = <"["> identifier <"]">
+inputs = <"["> whitespace? identifier (whitespace identifier)* whitespace? <"]">
 <math> = mean
 mean = <"mean">
-<thing> = turtles
+<thing> = turtles | patches | links
 turtles = <"turtles">
-ask = <"ask"> whitespace thing whitespace <"["> (whitespace | newline) (whitespace? move newline?)* (whitespace | newline) <"]">
-move = direction whitespace expression finish
-<direction> = forward | right
-forward = <"forward">
-right = <"right">
-random = <"random">
+patches = <"patches">
+links = <"links">
+ask = <"ask"> whitespace identifier whitespace <"["> (whitespace | newline) whitespace? line (newline line)* (whitespace | newline) <"]">
 ifblock = <"["> (whitespace | newline) line (newline line)* (whitespace | newline) <"]"> finish
 ifelse = <"ifelse"> whitespace expression finish newline whitespace? ifblock (whitespace | newline) ifblock
