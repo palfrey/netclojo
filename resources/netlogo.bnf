@@ -1,25 +1,25 @@
-S = globals? (block newline)* block
-globals = <"globals"> whitespace inputs finish newline
-own-thing = thing <"-own"> whitespace inputs finish
-<block> = own-thing | line
-line = whitespace? (if| ifelse | ask | report | (identifier (whitespace expression)*)) finish
+S = globals | (globals spacing)? (block endline)* block whitespace? comment? newline?
+globals = <"globals"> whitespace inputs
+own-thing = thing <"-own"> whitespace inputs
+<block> = own-thing | line | whitespace?
+line = whitespace? (to | to-report |if| ifelse | ask | (identifier (whitespace expression)*))
 <finish> = whitespace? comment?
 <newline> = <"\n">
-to = <"to">
-to-report = <"to-report">
 end = <"end">
+to = <"to"> whitespace identifier whitespace inputs
+to-report = <"to-report"> whitespace identifier whitespace inputs
 identifier = #'[a-zA-Z][a-zA-Z-\d]*'
-<comment> = <";"> <#'.*'>
+<comment> = <";"> <#'[^\n]*'>
 <whitespace> = <#'[ \t]+'>
 number = #"-?\d+"
 report = <"report"> whitespace expression
 <expression> = number
 	| identifier
-	| (math whitespace expression)
+	| (identifier whitespace expression)
 	| (identifier whitespace binary whitespace number)
 	| brackets
 	| unary whitespace expression
-	| inputs whitespace <"of"> whitespace identifier
+	| inputs whitespace "of" whitespace identifier
 brackets = <"("> whitespace? expression whitespace? <")">
 <unary> = minus
 <binary> = gte | gt
@@ -27,13 +27,13 @@ gte = <">=">
 gt = <">">
 minus = <"-">
 inputs = <"["> whitespace? identifier (whitespace identifier)* whitespace? <"]">
-<math> = mean
-mean = <"mean">
 <thing> = turtles | patches | links
 turtles = <"turtles">
 patches = <"patches">
 links = <"links">
-ask = <"ask"> whitespace identifier (whitespace|newline whitespace?) (number (whitespace?|finish newline whitespace?))* <"["> (whitespace? | newline whitespace?) line (newline line)* <"]">
-ifblock = <"["> (whitespace | newline) line (newline line)* (whitespace | newline) <"]"> finish
+<endline> = finish newline whitespace?
+<spacing> = (whitespace | endline)
+ask = <"ask"> whitespace identifier spacing (number spacing)* <"["> spacing line (whitespace? comment? newline line)* spacing <"]">
+ifblock = <"["> spacing line (newline line)* spacing <"]"> finish
 if = <"if"> whitespace expression finish newline whitespace? ifblock
-ifelse = <"ifelse"> whitespace expression finish newline whitespace? ifblock (whitespace | newline) ifblock
+ifelse = <"ifelse"> whitespace expression spacing ifblock spacing ifblock

@@ -15,8 +15,15 @@
 
   :profiles {:generator
 			 {
-			  :dependencies [[instaparse "1.3.3"]]
+			  :dependencies
+				[
+					[instaparse "1.3.3"]
+					[midje "1.6.3"]
+					[slingshot "0.10.3"]
+				]
 			  :main "netclojo.generator"
+			  :plugins [[lein-midje "3.0.0"]]
+			  :source-paths ["src" "resources"]
 			 }
 			}
   :aliases {"generator" ["with-profile" "+generator" "run"]}
