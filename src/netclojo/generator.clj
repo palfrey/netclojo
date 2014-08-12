@@ -1,7 +1,8 @@
 (ns netclojo.generator
   (:require
    [instaparse.core :as insta]
-   [clojure.pprint :as pprint]))
+   [clojure.pprint :as pprint]
+   [clojure.edn :as edn]))
 
 (def netlogo
   (insta/parser (clojure.java.io/resource "netlogo.bnf"))
@@ -15,11 +16,15 @@
 			(insta/failure? simple)
 				(println simple)
 			(= (count multiple) 1)
-				(pprint/pprint (insta/transform
-								{
-								 :identifier keyword
-								}
-								(first multiple)))
+				(pprint/pprint (->> multiple first
+								(insta/transform
+									{
+									 :identifier keyword
+									 :number (comp edn/read-string str)
+									}
+								)
+							)
+				)
 			:default
 				(
 					(println "Ambiguous parse!")

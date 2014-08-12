@@ -1,10 +1,10 @@
 S = globals? block+
 globals = <"globals"> whitespace inputs finish newline
 own-thing = thing <"-own"> whitespace inputs finish newline
-block = (whitespace? newline) | own-thing | toline (line newline)+ endline
+block = (whitespace? newline) | own-thing | toline (line newline)+ endline | line
 <toline> = (to-report |to) whitespace identifier (whitespace inputs)? finish newline
 <endline> = end finish
-line = whitespace? (ifelse | ask | report | (identifier (whitespace arg)*)) finish
+line = whitespace? (if| ifelse | ask | report | (identifier (whitespace arg)*)) finish
 <finish> = whitespace? comment?
 <newline> = <"\n">
 to = <"to">
@@ -14,7 +14,7 @@ identifier = #'[a-zA-Z][a-zA-Z-\d]*'
 <comment> = <";"> <#'.*'>
 <whitespace> = <#'\s+'>
 arg = number | identifier | expression
-<number> = #"\d+"
+number = #"-?\d+"
 report = <"report"> whitespace expression
 <expression> = number
 	| identifier
@@ -25,8 +25,9 @@ report = <"report"> whitespace expression
 	| inputs whitespace <"of"> whitespace identifier
 brackets = <"("> whitespace? expression whitespace? <")">
 <unary> = minus
-<binary> = gte
+<binary> = gte | gt
 gte = <">=">
+gt = <">">
 minus = <"-">
 inputs = <"["> whitespace? identifier (whitespace identifier)* whitespace? <"]">
 <math> = mean
@@ -35,6 +36,7 @@ mean = <"mean">
 turtles = <"turtles">
 patches = <"patches">
 links = <"links">
-ask = <"ask"> whitespace identifier whitespace <"["> (whitespace | newline) whitespace? line (newline line)* (whitespace | newline) <"]">
+ask = <"ask"> whitespace identifier whitespace (number (whitespace|finish newline whitespace?))* <"["> (whitespace? | newline whitespace?) line (newline line)* <"]">
 ifblock = <"["> (whitespace | newline) line (newline line)* (whitespace | newline) <"]"> finish
+if = <"if"> whitespace expression finish newline whitespace? ifblock
 ifelse = <"ifelse"> whitespace expression finish newline whitespace? ifblock (whitespace | newline) ifblock
