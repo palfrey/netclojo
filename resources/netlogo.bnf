@@ -33,10 +33,6 @@ minus = <"-">
 multiply = <"*">
 add = <"+">
 equal = <"=">
-<thing> = turtles | patches | links
-turtles = <"turtles">
-patches = <"patches">
-links = <"links">
 <endline> = finish newline whitespace?
 <spacing> = (whitespace | endline)
 ask = <"ask"> whitespace identifier spacing (number spacing)* <"["> statements <"]">
