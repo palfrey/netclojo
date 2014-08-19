@@ -101,3 +101,30 @@ show (map + [1 2 3] [100 200 300]) ;; a shorter way of writing the same") =>
 	   [:line :show [:brackets :map [:add] [:list 1 2 3] [:list 100 200 300]]]
 	   ]
 )
+
+(fact "agentsets"
+	  (gen/parse "ask one-of turtles [ set color green ] ;; one-of reports a random agent from an agentset
+ask (max-one-of turtles [wealth]) [ donate ] ;; max-one-of agentset [reporter] reports an agent in the agentset that has the highest value for the given reporter
+show mean ([wealth] of turtles) ;; Use of to make a list of values, one for each agent in the agentset.
+show (turtle-set turtle 0 turtle 2 turtle 9) ;; Use turtle-set, patch-set and link-set reporters to make new agentsets by gathering together agents from a variety of sources
+show turtles = patches ;; Check whether two agentsets are equal using = or !=
+show member? turtle 0 turtles ;; Use member? to see if an agent is a member of an agentset.
+if all? turtles [color = red] ;; use ?all to see if every agent in the
+ [ show \"every turtle is red!\" ] ;; agentset satisfies a certain condition
+ask turtles [create-links-to other turtles-here ;; on same patch as me, not me,
+with [color = [color] of myself] ] ;; and with same color as me.
+show [([color] of end1) - ([color] of end2)] of links ;; check everything’s OK") =>
+	  [:S
+	   [:line :ask :one-of :turtles [:list [:line :set :color :green]]]
+	   [:line :ask [:brackets :max-one-of :turtles [:list :wealth]] [:list [:line :donate]]]
+	   [:line :show :mean [:brackets [:list :wealth] :of :turtles]]
+	   [:line :show [:brackets :turtle-set :turtle 0 :turtle 2 :turtle 9]]
+	   [:line :show :turtles [:equal] :patches]
+	   [:line :show :member? :turtle 0 :turtles]
+	   [:line [:if :all? :turtles [:list :color [:equal] :red]
+			   [:ifblock [:line :show [:string "every turtle is red!"]]]]]
+	   [:line :ask :turtles [:list
+							 [:line :create-links-to :other :turtles-here]
+							 [:line :with [:list :color [:equal] [:list :color] :of :myself]]]]
+	   [:line :show [:list [:brackets [:list :color] :of :end1] [:minus] [:brackets [:list :color] :of :end2]] :of :links]]
+)
