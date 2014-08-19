@@ -32,9 +32,9 @@ end") =>  [:S [:line :to :go] [:line :ask :turtles [:list [:line :forward 1] [:l
  [ report (- number) ] ;; Otherwise, return the opposite, which
 end") => [:S
 		  [:line :to-report :absolute-value [:list :number]]
-		  [:line [:ifelse :number [:gte] 0
-				  [:ifblock [:line :report :number]]
-				  [:ifblock [:line :report [:brackets [:minus] :number]]]]]
+		  [:line :ifelse :number [:gte] 0]
+		  [:line [:list [:line :report :number]]]
+		  [:line [:list [:line :report [:brackets [:minus] :number]]]]
 		  [:line :end]])
 
 (fact "globals"
@@ -121,8 +121,8 @@ show [([color] of end1) - ([color] of end2)] of links ;; check everything’s OK
 	   [:line :show [:brackets :turtle-set :turtle 0 :turtle 2 :turtle 9]]
 	   [:line :show :turtles [:equal] :patches]
 	   [:line :show :member? :turtle 0 :turtles]
-	   [:line [:if :all? :turtles [:list :color [:equal] :red]
-			   [:ifblock [:line :show [:string "every turtle is red!"]]]]]
+	   [:line :if :all? :turtles [:list :color [:equal] :red]]
+	   [:line [:list [:line :show [:string "every turtle is red!"]]]]
 	   [:line :ask :turtles [:list
 							 [:line :create-links-to :other :turtles-here]
 							 [:line :with [:list :color [:equal] [:list :color] :of :myself]]]]
