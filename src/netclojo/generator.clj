@@ -11,6 +11,13 @@
   (insta/parser (clojure.java.io/resource "netlogo.bnf"))
 )
 
+(defn number-convert [& more]
+  (if (or
+	   (nil? (first more))
+	   (= (count more) 0))
+	[:item] (conj [:item] (apply edn/read-string more)))
+)
+
 (defn parse [source]
 	(let [simple (netlogo source)
 		  multiple (insta/parses netlogo source)]
@@ -25,6 +32,7 @@
 						{
 							:identifier keyword
 							:number (comp edn/read-string str)
+							:item number-convert
 						}
 					)
 				)

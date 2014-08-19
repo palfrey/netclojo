@@ -85,5 +85,19 @@ set my-list replace-item 2 my-list 10 ;; my-list is now [2 7 10 \"Bob\" [3 0 -2]
 	   [:line :show [:list :pxcor [:multiply] :pycor] :of :patches]
 	   [:line :set :my-list [:list 2 7 5 [:string "Bob"] [:list 3 0 -2]]]
 	   [:line :set :my-list :replace-item 2 :my-list 10]]
+)
 
+(fact "iterate-lists"
+	  (gen/parse "foreach [1.2 4.6 6.1] [ show (word ? \" -> \" round ?) ]
+show map [round ?] [1.2 2.2 2.7] ;; prints [1 2 3]
+show map round [1.2 2.2 2.7] ;; a shorter way (see Tasks in Programming Guide)
+show (map [?1 + ?2] [1 2 3] [100 200 300]) ;; prints [101 202 303]
+show (map + [1 2 3] [100 200 300]) ;; a shorter way of writing the same") =>
+	  [:S
+	   [:line :foreach [:list 1.2 4.6 6.1] [:list [:line :show [:brackets :word [:item] [:string " -> "] :round [:item]]]]]
+	   [:line :show :map [:list :round [:item]] [:list 1.2 2.2 2.7]]
+	   [:line :show :map :round [:list 1.2 2.2 2.7]]
+	   [:line :show [:brackets :map [:list [:item 1] [:add] [:item 2]] [:list 1 2 3] [:list 100 200 300]]]
+	   [:line :show [:brackets :map [:add] [:list 1 2 3] [:list 100 200 300]]]
+	   ]
 )

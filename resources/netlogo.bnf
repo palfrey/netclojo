@@ -8,7 +8,7 @@ to = <"to"> whitespace identifier whitespace list
 identifier = #'[a-zA-Z][a-zA-Z-\d]*'
 <comment> = <";"> <#'[^\n]*'>
 <whitespace> = <#'[ \t]+'>
-number = #"-?\d+"
+number = #"-?\d+(?:\.\d+)?"
 report = <"report"> whitespace expression
 <expression> = number
 	| identifier
@@ -18,17 +18,20 @@ report = <"report"> whitespace expression
 	| unary whitespace expression
 	| list
 	| string
+	| item
+item = <"?"> #"\d+"?
 string = <"\""> #'[^\"]*' <"\"">
 <expressions> = expression? (whitespace expression)*
 <statements> = spacing line (newline line)* spacing
 list = <"["> (expressions | statements) <"]">
 brackets = <"("> whitespace? expression whitespace? <")">
 <unary> = minus
-<binary> = gte | gt | multiply
+<binary> = gte | gt | multiply | add | minus
 gte = <">=">
 gt = <">">
 minus = <"-">
 multiply = <"*">
+add = <"+">
 <thing> = turtles | patches | links
 turtles = <"turtles">
 patches = <"patches">
