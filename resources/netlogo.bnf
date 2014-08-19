@@ -1,13 +1,10 @@
-S = globals | (globals spacing)? (block endline)* block whitespace? comment? newline?
-globals = <"globals"> whitespace inputs
-own-thing = thing <"-own"> whitespace inputs
-<block> = own-thing | line | whitespace?
-line = whitespace? (to | to-report |if| ifelse | ask | (identifier (whitespace expression)*))
+S = (block endline)* block whitespace? comment? newline?
+<block> = line | whitespace?
+line = whitespace? (if| ifelse | (identifier (whitespace expression)*)) finish
 <finish> = whitespace? comment?
 <newline> = <"\n">
 end = <"end">
-to = <"to"> whitespace identifier whitespace inputs
-to-report = <"to-report"> whitespace identifier whitespace inputs
+to = <"to"> whitespace identifier whitespace list
 identifier = #'[a-zA-Z][a-zA-Z-\d]*'
 <comment> = <";"> <#'[^\n]*'>
 <whitespace> = <#'[ \t]+'>
@@ -15,25 +12,30 @@ number = #"-?\d+"
 report = <"report"> whitespace expression
 <expression> = number
 	| identifier
-	| (identifier whitespace expression)
-	| (identifier whitespace binary whitespace number)
+	| (expression whitespace expression)
+	| (expression whitespace binary whitespace expression)
 	| brackets
 	| unary whitespace expression
-	| inputs whitespace "of" whitespace identifier
+	| list
+	| string
+string = <"\""> #'[^\"]*' <"\"">
+<expressions> = expression? (whitespace expression)*
+<statements> = spacing line (newline line)* spacing
+list = <"["> (expressions | statements) <"]">
 brackets = <"("> whitespace? expression whitespace? <")">
 <unary> = minus
-<binary> = gte | gt
+<binary> = gte | gt | multiply
 gte = <">=">
 gt = <">">
 minus = <"-">
-inputs = <"["> whitespace? identifier (whitespace identifier)* whitespace? <"]">
+multiply = <"*">
 <thing> = turtles | patches | links
 turtles = <"turtles">
 patches = <"patches">
 links = <"links">
 <endline> = finish newline whitespace?
 <spacing> = (whitespace | endline)
-ask = <"ask"> whitespace identifier spacing (number spacing)* <"["> spacing line (whitespace? comment? newline line)* spacing <"]">
-ifblock = <"["> spacing line (newline line)* spacing <"]"> finish
+ask = <"ask"> whitespace identifier spacing (number spacing)* <"["> statements <"]">
+ifblock = <"["> statements <"]"> finish
 if = <"if"> whitespace expression finish newline whitespace? ifblock
 ifelse = <"ifelse"> whitespace expression spacing ifblock spacing ifblock

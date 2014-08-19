@@ -39,7 +39,7 @@
 	(try+
 		(parse source)
 		(catch [:type :ambiguous-parse] {:keys [:data]}
-			(doall (map println data))
+			(doall (map pprint/pprint data))
 			(throw+)
 		)
 	)
