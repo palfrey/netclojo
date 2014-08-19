@@ -1,15 +1,12 @@
 S = (block endline)* block whitespace? comment? newline?
 <block> = line | whitespace?
-line = whitespace? (if| ifelse | (identifier (whitespace expression)*)) finish
+line = whitespace? (if | ifelse | (identifier (whitespace expression)*)) finish
 <finish> = whitespace? comment?
 <newline> = <"\n">
-end = <"end">
-to = <"to"> whitespace identifier whitespace list
 identifier = #'[a-zA-Z][a-zA-Z-\d\?]*'
 <comment> = <";"> <#'[^\n]*'>
 <whitespace> = <#'[ \t]+'>
 number = #"-?\d+(?:\.\d+)?"
-report = <"report"> whitespace expression
 <expression> = number
 	| identifier
 	| (expression whitespace expression)
@@ -35,7 +32,6 @@ add = <"+">
 equal = <"=">
 <endline> = finish newline whitespace?
 <spacing> = (whitespace | endline)
-ask = <"ask"> whitespace identifier spacing (number spacing)* <"["> statements <"]">
 ifblock = <"["> statements <"]">
 if = <"if"> whitespace expression finish newline whitespace? ifblock
 ifelse = <"ifelse"> whitespace expression spacing ifblock spacing ifblock
