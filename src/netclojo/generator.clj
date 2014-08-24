@@ -22,6 +22,12 @@
 	(vec (concat [:own (keyword named)] more))
 )
 
+(defn line-convert [& more]
+	(let [vecced (vec more)]
+		(if (and (= (count vecced) 1) (vector? (first vecced))) (first vecced) vecced)
+	)
+)
+
 (defn parse [source]
 	(let [simple (netlogo source)
 		  multiple (insta/parses netlogo source)]
@@ -38,6 +44,7 @@
 							:number (comp edn/read-string str)
 							:item number-convert
 							:own own-convert
+							:line line-convert
 						}
 					)
 				)
