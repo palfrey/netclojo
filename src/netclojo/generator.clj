@@ -18,6 +18,10 @@
 	[:item] (conj [:item] (apply edn/read-string more)))
 )
 
+(defn own-convert [named & more]
+	(vec (concat [:own (keyword named)] more))
+)
+
 (defn parse [source]
 	(let [simple (netlogo source)
 		  multiple (insta/parses netlogo source)]
@@ -33,6 +37,7 @@
 							:identifier keyword
 							:number (comp edn/read-string str)
 							:item number-convert
+							:own own-convert
 						}
 					)
 				)

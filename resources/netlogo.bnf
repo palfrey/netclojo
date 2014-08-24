@@ -1,6 +1,6 @@
-S = (block endline)* block whitespace? comment? newline?
+S = (block endline)* block finish newline?
 <block> = line | whitespace?
-line = whitespace? (expression (whitespace expression)*) finish
+line = whitespace? (ask|foreach|ifelse|own|(!("turtles-own"|"patches-own"|"links-own"|"ifelse"|"ask"|"foreach") expression)) finish
 <finish> = whitespace? comment?
 <newline> = <"\n">
 identifier = #'[a-zA-Z][a-zA-Z-\d\?]*'
@@ -13,23 +13,28 @@ number = #"-?\d+(?:\.\d+)?"
 	| (expression whitespace binary whitespace expression)
 	| brackets
 	| unary whitespace expression
-	| list
+	| expressionblock
 	| string
 	| item
 item = <"?"> #"\d+"?
 string = <"\""> #'[^\"]*' <"\"">
 <expressions> = expression? (whitespace expression)*
-<statements> = spacing? line (newline line)* spacing
-list = <"["> (expressions | statements) <"]">
+<statements> = line (newline line)*
 brackets = <"("> whitespace? expression whitespace? <")">
 <unary> = minus
-<binary> = gte | gt | multiply | add | minus | equal
+<binary> = gte | gt | lt | multiply | add | minus | equal
 gte = <">=">
 gt = <">">
+lt = <"<">
 minus = <"-">
 multiply = <"*">
 add = <"+">
 equal = <"=">
 <endline> = finish newline whitespace?
 <spacing> = (whitespace | endline)
-statementblock = <"["> statements <"]">
+statementblock = <"["> spacing? statements spacing? <"]">
+expressionblock =<"["> whitespace? expressions whitespace? <"]">
+ask = <"ask"> whitespace expression spacing statementblock
+foreach = <"foreach"> whitespace expression spacing statementblock
+ifelse = <"ifelse"> whitespace expression spacing statementblock spacing statementblock
+own = ("turtles"|"patches"|"links") <"-own"> whitespace expressionblock
