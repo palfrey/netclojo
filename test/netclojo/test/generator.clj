@@ -10,12 +10,12 @@
 	(gen/parse "to setup ;; comments are written after semicolon(s)
  clear-all ;; clear everything
  create-turtles 10 ;; make 10 new turtles
-end ; (one semicolon is enough, but I like two)") => [:S [:to :setup] [:clear-all] [:create-turtles 10] [:end]])
+end ; (one semicolon is enough, but I like two)") => [:S [:to :setup [:statements [:clear-all] [:create-turtles 10]]]])
 
 (fact "Report"
 	(gen/parse "to-report average-wealth ;; this reporter returns the
  report mean [wealth] of turtles ;; average wealth in the
-end") => [:S [:to-report :average-wealth] [:report :mean [:expressionblock :wealth] :of :turtles] [:end]])
+end") => [:S [:to-report :average-wealth [:statements [:report :mean [:expressionblock :wealth] :of :turtles]]]])
 
 (fact "Basic movement"
 	(gen/parse "to go
@@ -24,9 +24,9 @@ forward 1 ;; all turtles move forward one step
  right random 360 ;; ...and turn a random amount
  ]
 end") =>  [:S
-		   [:to :go]
-		   [:ask :turtles [:statementblock [:forward 1] [:right :random 360]]]
-	  [:end]])
+		   [:to :go [:statements
+		   [:ask :turtles [:statements [:forward 1] [:right :random 360]]]
+	  ]]])
 
 (fact "Report input"
 	(gen/parse "to-report absolute-value [number] ;; number is the input
@@ -34,11 +34,11 @@ end") =>  [:S
  [ report number ] ;; return number (a non-negative value).
  [ report (- number) ] ;; Otherwise, return the opposite, which
 end") => [:S
-		  [:to-report :absolute-value [:expressionblock :number]]
+		  [:to-report :absolute-value [:expressionblock :number] [:statements
 		  [:ifelse :number [:gte] 0
-			  [:statementblock [:report :number]]
-			  [:statementblock [:report [:brackets [:minus] :number]]]]
-		  [:end]])
+			  [:statements [:report :number]]
+			  [:statements [:report [:brackets [:minus] :number]]]]
+		  ]]])
 
 (fact "globals"
 	(gen/parse "globals [ number-of-trees ]") => [:S [:globals [:expressionblock :number-of-trees]]]
@@ -62,11 +62,11 @@ links-own [ strength ] ;; each link has its own strength
 ;; now set turtle2’s color to turtle1’s (original) color
 end ;; (which was conveniently stored in local variable “temp”).")
 	  =>  [:S
-		   [:to :swap-colors [:expressionblock :turtle1 :turtle2]]
+		   [:to :swap-colors [:expressionblock :turtle1 :turtle2] [:statements
 		   [:let :temp [:brackets [:expressionblock :color] :of :turtle1]]
-		   [:ask :turtle1 [:statementblock [:set :color [:brackets [:expressionblock :color] :of :turtle2]]]]
-		   [:ask :turtle2 [:statementblock [:set :color :temp]]]
-		   [:end]]
+		   [:ask :turtle1 [:statements [:set :color [:brackets [:expressionblock :color] :of :turtle2]]]]
+		   [:ask :turtle2 [:statements [:set :color :temp]]]
+		   ]]]
 )
 
 (fact "lists"
@@ -98,7 +98,7 @@ show (map [?1 + ?2] [1 2 3] [100 200 300]) ;; prints [101 202 303]
 show (map + [1 2 3] [100 200 300]) ;; a shorter way of writing the same") =>
 	  [:S
 	   [:foreach [:expressionblock 1.2 4.6 6.1]
-			   [:statementblock [:show [:brackets :word [:item] [:string " -> "] :round [:item]]]]]
+			   [:statements [:show [:brackets :word [:item] [:string " -> "] :round [:item]]]]]
 	   [:show :map [:expressionblock :round [:item]] [:expressionblock 1.2 2.2 2.7]]
 	   [:show :map :round [:expressionblock 1.2 2.2 2.7]]
 	   [:show [:brackets :map [:expressionblock [:item 1] [:add] [:item 2]] [:expressionblock 1 2 3] [:expressionblock 100 200 300]]]
@@ -118,8 +118,8 @@ ask turtles [create-links-to other turtles-here ;; on same patch as me, not me,
 with [color = [color] of myself] ] ;; and with same color as me.
 show [([color] of end1) - ([color] of end2)] of links ;; check everything’s OK") =>
 	  [:S
-	   [:ask :one-of :turtles [:statementblock [:set :color :green]]]
-	   [:ask [:brackets :max-one-of :turtles [:expressionblock :wealth]] [:statementblock [:donate]]]
+	   [:ask :one-of :turtles [:statements [:set :color :green]]]
+	   [:ask [:brackets :max-one-of :turtles [:expressionblock :wealth]] [:statements [:donate]]]
 	   [:show :mean [:brackets [:expressionblock :wealth] :of :turtles]]
 	   [:show [:brackets :turtle-set :turtle 0 :turtle 2 :turtle 9]]
 	   [:show :turtles [:equal] :patches]
@@ -127,7 +127,7 @@ show [([color] of end1) - ([color] of end2)] of links ;; check everything’s OK
 	   [:if :all? :turtles [:expressionblock :color [:equal] :red]]
 	   [:expressionblock :show [:string "every turtle is red!"]]
 	   [:ask :turtles
-			   [:statementblock [:create-links-to :other :turtles-here]
+			   [:statements [:create-links-to :other :turtles-here]
 				[:with [:expressionblock :color [:equal] [:expressionblock :color] :of :myself]]]]
 	   [:show [:expressionblock [:brackets [:expressionblock :color] :of :end1] [:minus] [:brackets [:expressionblock :color] :of :end2]] :of :links]]
 )
@@ -152,14 +152,14 @@ foreach my-list-of-agents [
  set color blue ;; start until the previous one has finished.
 ]]") =>
 	  [:S
-	   [:ask :turtles [:statementblock [:forward :random 10] [:wait 0.5] [:set :color :blue]]]
-	   [:ask :turtles [:statementblock [:forward :random 10]]]
-	   [:ask :turtles [:statementblock [:wait 0.5]]]
-	   [:ask :turtles [:statementblock [:set :color :blue]]]
+	   [:ask :turtles [:statements [:forward :random 10] [:wait 0.5] [:set :color :blue]]]
+	   [:ask :turtles [:statements [:forward :random 10]]]
+	   [:ask :turtles [:statements [:wait 0.5]]]
+	   [:ask :turtles [:statements [:set :color :blue]]]
 	   [:set :my-list-of-agents :sort-by [:expressionblock [:expressionblock :size] :of [:item 1] [:lt] [:expressionblock :size] :of [:item 2]] :turtles]
 	   [:foreach :my-list-of-agents
-			   [:statementblock [:ask [:item]
-										[:statementblock [:forward :random 10]
+			   [:statements [:ask [:item]
+										[:statements [:forward :random 10]
 										 [:wait 0.5]
 										 [:set :color :blue]]]]]]
 	  )
