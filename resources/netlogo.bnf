@@ -18,7 +18,7 @@ number = #"-?\d+(?:\.\d+)?"
 	| item
 item = <"?"> #"\d+"?
 string = <"\""> #'[^\"]*' <"\"">
-<expressions> = expression? (whitespace expression)*
+expressions = expression? (whitespace expression)*
 statements = line (newline line)*
 brackets = <"("> whitespace? expression whitespace? <")">
 <unary> = minus
@@ -33,7 +33,7 @@ equal = <"=">
 <endline> = finish newline whitespace?
 <spacing> = (whitespace | endline)
 <statementblock> = <"["> spacing? statements spacing? <"]">
-expressionblock =<"["> whitespace? expressions whitespace? <"]">
+<expressionblock> =<"["> whitespace? expressions whitespace? <"]">
 ask = <"ask"> whitespace expression spacing statementblock
 foreach = <"foreach"> whitespace expression spacing statementblock
 ifelse = <"ifelse"> whitespace expression spacing statementblock spacing statementblock

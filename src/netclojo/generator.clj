@@ -42,9 +42,11 @@
 						{
 							:identifier keyword
 							:number (comp edn/read-string str)
+							:string str
 							:item number-convert
 							:own own-convert
 							:line line-convert
+							:expressions line-convert
 						}
 					)
 				)

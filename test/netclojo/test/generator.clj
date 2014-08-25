@@ -15,7 +15,7 @@ end ; (one semicolon is enough, but I like two)") => [:S [:to :setup [:statement
 (fact "Report"
 	(gen/parse "to-report average-wealth ;; this reporter returns the
  report mean [wealth] of turtles ;; average wealth in the
-end") => [:S [:to-report :average-wealth [:statements [:report :mean [:expressionblock :wealth] :of :turtles]]]])
+end") => [:S [:to-report :average-wealth [:statements [:report :mean [:wealth] :of :turtles]]]])
 
 (fact "Basic movement"
 	(gen/parse "to go
@@ -34,14 +34,14 @@ end") =>  [:S
  [ report number ] ;; return number (a non-negative value).
  [ report (- number) ] ;; Otherwise, return the opposite, which
 end") => [:S
-		  [:to-report :absolute-value [:expressionblock :number] [:statements
+		  [:to-report :absolute-value [:number] [:statements
 		  [:ifelse :number [:gte] 0
 			  [:statements [:report :number]]
 			  [:statements [:report [:brackets [:minus] :number]]]]
 		  ]]])
 
 (fact "globals"
-	(gen/parse "globals [ number-of-trees ]") => [:S [:globals [:expressionblock :number-of-trees]]]
+	(gen/parse "globals [ number-of-trees ]") => [:S [:globals [:number-of-trees]]]
 )
 
 (fact "own"
@@ -49,9 +49,9 @@ end") => [:S
 patches-own [ roughness ] ;; each patch has its own roughness
 links-own [ strength ] ;; each link has its own strength
 ") => [:S
-	   [:own :turtles [:expressionblock :energy]]
-	   [:own :patches [:expressionblock :roughness]]
-	   [:own :links [:expressionblock :strength]]])
+	   [:own :turtles [:energy]]
+	   [:own :patches [:roughness]]
+	   [:own :links [:strength]]])
 
 (fact "let"
 	(gen/parse "to swap-colors [turtle1 turtle2] ;; turtle1 and turtle2 are inputs
@@ -62,9 +62,9 @@ links-own [ strength ] ;; each link has its own strength
 ;; now set turtle2’s color to turtle1’s (original) color
 end ;; (which was conveniently stored in local variable “temp”).")
 	  =>  [:S
-		   [:to :swap-colors [:expressionblock :turtle1 :turtle2] [:statements
-		   [:let :temp [:brackets [:expressionblock :color] :of :turtle1]]
-		   [:ask :turtle1 [:statements [:set :color [:brackets [:expressionblock :color] :of :turtle2]]]]
+		   [:to :swap-colors [:turtle1 :turtle2] [:statements
+		   [:let :temp [:brackets [:color] :of :turtle1]]
+		   [:ask :turtle1 [:statements [:set :color [:brackets [:color] :of :turtle2]]]]
 		   [:ask :turtle2 [:statements [:set :color :temp]]]
 		   ]]]
 )
@@ -80,13 +80,13 @@ show [pxcor * pycor] of patches
 set my-list [2 7 5 \"Bob\" [3 0 -2]] ;; my-list is now [2 7 5 \"Bob\" [3 0 -2]]
 set my-list replace-item 2 my-list 10 ;; my-list is now [2 7 10 \"Bob\" [3 0 -2]]") =>
 	  [:S
-	   [:set :my-list [:expressionblock 2 4 6 8]]
+	   [:set :my-list [2 4 6 8]]
 	   [:set :my-random-list :list [:brackets :random 10] [:brackets :random 20]]
 	   [:show [:brackets :list :random 10]]
 	   [:show [:brackets :list :random 10 :random 20 :random 30]]
-	   [:set :fitness-list [:brackets [:expressionblock :fitness] :of :turtles]]
-	   [:show [:expressionblock :pxcor [:multiply] :pycor] :of :patches]
-	   [:set :my-list [:expressionblock 2 7 5 [:string "Bob"] [:expressionblock 3 0 -2]]]
+	   [:set :fitness-list [:brackets [:fitness] :of :turtles]]
+	   [:show [:pxcor [:multiply] :pycor] :of :patches]
+	   [:set :my-list [2 7 5 "Bob" [3 0 -2]]]
 	   [:set :my-list :replace-item 2 :my-list 10]]
 )
 
@@ -97,12 +97,12 @@ show map round [1.2 2.2 2.7] ;; a shorter way (see Tasks in Programming Guide)
 show (map [?1 + ?2] [1 2 3] [100 200 300]) ;; prints [101 202 303]
 show (map + [1 2 3] [100 200 300]) ;; a shorter way of writing the same") =>
 	  [:S
-	   [:foreach [:expressionblock 1.2 4.6 6.1]
-			   [:statements [:show [:brackets :word [:item] [:string " -> "] :round [:item]]]]]
-	   [:show :map [:expressionblock :round [:item]] [:expressionblock 1.2 2.2 2.7]]
-	   [:show :map :round [:expressionblock 1.2 2.2 2.7]]
-	   [:show [:brackets :map [:expressionblock [:item 1] [:add] [:item 2]] [:expressionblock 1 2 3] [:expressionblock 100 200 300]]]
-	   [:show [:brackets :map [:add] [:expressionblock 1 2 3] [:expressionblock 100 200 300]]]]
+	   [:foreach [1.2 4.6 6.1]
+			   [:statements [:show [:brackets :word [:item] " -> " :round [:item]]]]]
+	   [:show :map [:round [:item]] [1.2 2.2 2.7]]
+	   [:show :map :round [1.2 2.2 2.7]]
+	   [:show [:brackets :map [[:item 1] [:add] [:item 2]] [1 2 3] [100 200 300]]]
+	   [:show [:brackets :map [:add] [1 2 3] [100 200 300]]]]
 )
 
 (fact "agentsets"
@@ -119,17 +119,17 @@ with [color = [color] of myself] ] ;; and with same color as me.
 show [([color] of end1) - ([color] of end2)] of links ;; check everything’s OK") =>
 	  [:S
 	   [:ask :one-of :turtles [:statements [:set :color :green]]]
-	   [:ask [:brackets :max-one-of :turtles [:expressionblock :wealth]] [:statements [:donate]]]
-	   [:show :mean [:brackets [:expressionblock :wealth] :of :turtles]]
+	   [:ask [:brackets :max-one-of :turtles [:wealth]] [:statements [:donate]]]
+	   [:show :mean [:brackets [:wealth] :of :turtles]]
 	   [:show [:brackets :turtle-set :turtle 0 :turtle 2 :turtle 9]]
 	   [:show :turtles [:equal] :patches]
 	   [:show :member? :turtle 0 :turtles]
-	   [:if :all? :turtles [:expressionblock :color [:equal] :red]]
-	   [:expressionblock :show [:string "every turtle is red!"]]
+	   [:if :all? :turtles [:color [:equal] :red]]
+	   [:show "every turtle is red!"]
 	   [:ask :turtles
 			   [:statements [:create-links-to :other :turtles-here]
-				[:with [:expressionblock :color [:equal] [:expressionblock :color] :of :myself]]]]
-	   [:show [:expressionblock [:brackets [:expressionblock :color] :of :end1] [:minus] [:brackets [:expressionblock :color] :of :end2]] :of :links]]
+				[:with [:color [:equal] [:color] :of :myself]]]]
+	   [:show [[:brackets [:color] :of :end1] [:minus] [:brackets [:color] :of :end2]] :of :links]]
 )
 
 (fact "sync"
@@ -156,7 +156,7 @@ foreach my-list-of-agents [
 	   [:ask :turtles [:statements [:forward :random 10]]]
 	   [:ask :turtles [:statements [:wait 0.5]]]
 	   [:ask :turtles [:statements [:set :color :blue]]]
-	   [:set :my-list-of-agents :sort-by [:expressionblock [:expressionblock :size] :of [:item 1] [:lt] [:expressionblock :size] :of [:item 2]] :turtles]
+	   [:set :my-list-of-agents :sort-by [[:size] :of [:item 1] [:lt] [:size] :of [:item 2]] :turtles]
 	   [:foreach :my-list-of-agents
 			   [:statements [:ask [:item]
 										[:statements [:forward :random 10]
